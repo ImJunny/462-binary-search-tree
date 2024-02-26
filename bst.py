@@ -1,9 +1,12 @@
+import os
+# NODE class
 class Node:
   def __init__(self, val="None"):
     self.l = None
     self.val = val
     self.r = None
 
+# INSERT method
 def insert(root, val):
   if root is None: return Node(val)
 
@@ -12,6 +15,7 @@ def insert(root, val):
   else: print("Node already exists")
   return root
 
+# DELETE method
 def delete(root, val):
   if root is None: return root
   
@@ -35,7 +39,7 @@ def delete(root, val):
     succ = root.r
     while succ.l is not None:
       succParent = succ
-      succ = succ.left
+      succ = succ.l
     
     if succParent != root: succParent.l = succ.r
     else: succParent.r = succ.r
@@ -44,7 +48,8 @@ def delete(root, val):
 
     del succ
     return root
-  
+
+# TRAVERSAL methods
 def preorder(root):
   if root:
     print(root.val, end=" ")
@@ -63,10 +68,30 @@ def postorder(root):
     postorder(root.r)
     print(root.val, end=" ")
 
+# GENERATE graphiz
+def generate_dot(current_node, dot_file):
+    if current_node is not None:
+        if current_node.l is not None:
+            dot_file.write(f"{current_node.val} -> {current_node.l.val};\n")
+            generate_dot(current_node.l, dot_file)
+
+        if current_node.r is not None:
+            dot_file.write(f"{current_node.val} -> {current_node.r.val};\n")
+            generate_dot(current_node.r, dot_file)
+
+def generate_dot_file(root):
+    with open("bst.dot", "w") as dot_file:
+        dot_file.write("digraph BST {\n")
+        generate_dot(root, dot_file)
+        dot_file.write("}\n")
+
+    os.system("dot -Tpng bst.dot -o bst.png")
+
+# MAIN
 if __name__ == "__main__":
   root = Node(int(input("Insert node: ")))
   while(True):
-    print("Type insert | delete | preorder | inorder | postorder | quit")
+    print("Type insert | delete | preorder | inorder | postorder | generate | quit")
     userInput = input("Input: ")
 
     if (userInput == "insert"): root = insert(root, int(input("Insert node: ")))
@@ -80,5 +105,7 @@ if __name__ == "__main__":
     elif (userInput =="postorder"):
       postorder(root)
       print()
+    elif (userInput =="generate"):
+      generate_dot_file(root)
     else:
       break
